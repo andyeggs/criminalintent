@@ -1,11 +1,13 @@
 package com.ctech.andyeggs.criminalintent;
 
+import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 
-public class MainActivity extends AppCompatActivity {
+public abstract class SingleFragmentActivity extends AppCompatActivity {
+
+    protected abstract Fragment createFragment();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -13,12 +15,12 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         FragmentManager fm = getSupportFragmentManager();
-        Fragment myCrimeFragment = fm.findFragmentById(R.id.fragment_container);
+        Fragment myFragment = fm.findFragmentById(R.id.fragment_container);
 
-        if (myCrimeFragment == null) {
-            myCrimeFragment = new CrimeFragment();
+        if (myFragment == null) {
+            myFragment = createFragment();
             fm.beginTransaction()
-                    .add(R.id.fragment_container, myCrimeFragment)
+                    .add(R.id.fragment_container, myFragment)
                     .commit();
         }
     }
