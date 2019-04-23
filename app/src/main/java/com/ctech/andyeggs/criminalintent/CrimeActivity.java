@@ -19,7 +19,7 @@ public class CrimeActivity extends SingleFragmentActivity {
     @Override
     protected Fragment createFragment() {
         //get the crimeId that was passed to us from the CrimeList via the Intent
-        UUID crimeId = getIntent().getSerializableExtra(EXTRA_CRIME_ID);
+        UUID crimeId = (UUID) getIntent().getSerializableExtra(EXTRA_CRIME_ID);
 
         //call the "NewInstance" method which will create a new CrimeFragment and store the crimeId inside
         return CrimeFragment.newInstance(crimeId);
