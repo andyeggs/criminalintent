@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
 import com.ctech.andyeggs.criminalintent.database.CrimeBaseHelper;
+import com.ctech.andyeggs.criminalintent.database.CrimeCursorWrapper;
 import com.ctech.andyeggs.criminalintent.database.CrimeDbSchema.CrimeTable;
 
 import java.util.ArrayList;
@@ -38,11 +39,39 @@ public class CrimeLab {
 
     public List<Crime> getCrimes() {
         List<Crime> crimes = new ArrayList<>();
+
+        CrimeCursorWrapper crimeCursor = queryCrimes(null, null);
+
+        try {
+            crimeCursor.moveToFirst();
+            while (crimeCursor.isAfterLast() != true) {
+                Crime thisCrime = crimeCursor.getCrime();
+                crimes.add(thisCrime);
+                crimeCursor.moveToNext();
+            }
+        } finally {
+            crimeCursor.close();
+        }
+
         return crimes;
     }
 
     public Crime getCrime(UUID id) {
-        return null;
+        String[] searchArgs = new String[] {id.toString()};
+
+        CrimeCursorWrapper crimeCursor = queryCrimes(
+                CrimeTable.Columns.UUID + " = ?", searchArgs);
+
+        try {
+            if (crimeCursor.getCount() == 0) {
+                return null;
+            } else {
+                crimeCursor.moveToFirst();
+                return crimeCursor.getCrime();
+            }
+        } finally {
+            crimeCursor.close();
+        }
     }
 
     private static ContentValues getContentValues(Crime crime) {
@@ -65,7 +94,7 @@ public class CrimeLab {
         mDatabase.update(CrimeTable.NAME, newValues, searchString, searchArgs);
     }
 
-    private Cursor queryCrimes(String whereClause, String[] whereArgs) {
+    private CrimeCursorWrapper queryCrimes(String whereClause, String[] whereArgs) {
         Cursor cursor = mDatabase.query(
                 CrimeTable.NAME,
                 null,
@@ -75,6 +104,6 @@ public class CrimeLab {
                 null,
                 null
         );
-        return cursor;
+        return new CrimeCursorWrapper(cursor);
     }
 }
